@@ -4,13 +4,16 @@ import rarfile
 import os
 import shutil
 import re
-from CustomTkinterMessagebox import CTkMessagebox
 import fnmatch
-from time import sleep
+from dotenv import load_dotenv
+
+load_dotenv()
 
 # app config
 app = ctk.CTk()
-app.title("demo_extractor")
+app.title("demo_exporter")
+app._set_appearance_mode("light")  # Default light mode uses lighter shades
+app.configure(bg="white")
 app.geometry("700x400")
 app.resizable(False, False)
 
@@ -23,9 +26,9 @@ danger_theme = '#990011'
 current_date = date.today()
 file_path = ''
 target_directory = os.getenv('CSGO_PATH')
-rarfile.UNRAR_TOOL = r"C:\Program Files\WinRAR\UnRAR.exe"
-
+rarfile.UNRAR_TOOL =  os.getenv('UNRAR_PATH') # "C:\Program Files\WinRAR\UnRAR.exe"
 dynamic_buttons = []
+
 
 
 # Partials
@@ -37,123 +40,59 @@ def sanitize_filename(filename):
     return sanitized.strip('_')  # Optional: Remove leading/trailing underscores if needed
 
 
-def main_display_worker_partial():
 
-    scrollable_frame = ctk.CTkScrollableFrame(
-        app,
-        orientation="vertical",
-        width=350,
-        height=300,
-    )
-
-    scrollable_frame.place(x=350, y=50, relwidth = 0.485, relheight=0.75)
-    scrollable_frame.grid_columnconfigure(0, weight=0)
-    scrollable_frame.grid_columnconfigure(1, weight=1)
-
-    i = 0
-
-    for filename in os.listdir(target_directory):
-        file_path = os.path.join(target_directory, filename)
-        if os.path.isfile(os.path.join(target_directory, filename)):
-            if fnmatch.fnmatch(filename, '*dem'):
-
-                scrollable_frame.grid_rowconfigure(i, weight=0)
-
-                var = ctk.BooleanVar(value=False) # Create boolean object and set its value to True
-                checkbox = ctk.CTkCheckBox(scrollable_frame, width=0, text='', variable=var, checkbox_height=20, checkbox_width=20, fg_color=color_theme) # Create a checkbox object
-                checkbox.grid(row=i, column=0) # Set the field to be in row = i and column 0
-
-                file_name_entry = ctk.CTkLabel(scrollable_frame, text=filename, width=0, anchor='w') # Create file_name object field
-                file_name_entry.grid(row = i, column=1, sticky='ew') # Set the field to be in row = i and column 1
-
-                i += 1
-        
-    if not i:
-        ctk.CTkLabel(scrollable_frame, text='Found no .dem files').pack()
-        
 
 def select_all_partial():
     
+    # iterate over each file and set the checkbox status to true
     for file in csgo_folder_files:
         base = csgo_folder_files[file]
         base['checkbox'].select(True)
-        print(base['checkbox'].get())
 
 
 def delete_all_partial():
 
+    global csgo_folder_files
+
+    # iterate over each file, check if the checkbox is checked and delete it.
     for file in csgo_folder_files:
         base = csgo_folder_files[file]
-        #print(base['checkbox'].get())
-        print(base['checkbox'].get())
         if base['checkbox'].get():
             os.remove(base['file_path'])
-            
             dynamic_buttons[0].destroy()
             dynamic_buttons[1].destroy()
 
-    main_display_worker_partial()
+    csgo_folder_files = {} # csgo_files_files.clear() instead of setting variable to global
+    refresh_partial()
 
 
 
-def test(*args):
+def export_files_partial():
 
     try:
 
         temp = file_path.split('/')[-1].split('.')
-
-        file_name = temp[0]
         file_type = temp[-1]
     
         if file_type == 'rar':
             with rarfile.RarFile(file_path) as rf:
                 for file in demo_files:
                     base = demo_files[file]
-                    
                     if base['checkbox'].get():
-
                         new_file_name = sanitize_filename(base['name'].get())
-                        
-                        
                         target_file_path = os.path.join(target_directory, new_file_name + '.dem')
-
-
                         extracted_path = rf.extract(base['main_object'].filename)
-                        
                         shutil.move(extracted_path, target_file_path)
-                        print(f"Extracted and renamed: {base['main_object']} → {new_file_name}")
         
-        else:
-            pass
-                    
-    except rarfile.BadRarFile:
-        print("Error: Invalid or corrupted RAR file")
     except Exception as e:
         print(f"An error occurred: {str(e)}")
 
+    finally:
+        refresh_partial()
 
-
-    CTkMessagebox.messagebox(title='demo_copier', text=f'Moved selected demos to csgo folder.', sound='on', button_text='OK')
-
-    # export.configure(state=ctk.DISABLED)
     
 
-
-
-
-
-
-def load_file():
-
-    file = ctk.filedialog.askopenfile()
-    export = ctk.CTkButton(app, text='Export', fg_color=color_theme, command=test)
-    export.pack(side=ctk.LEFT, anchor=ctk.S, padx=10, pady=10)
-    load_display_demo_files(file)
-
-
-
-
-def load_csgo_demo_files():
+def refresh_partial():
 
     if dynamic_buttons:
         for btn in dynamic_buttons:
@@ -164,13 +103,15 @@ def load_csgo_demo_files():
         orientation="vertical",
         width=350,
         height=300,
+        fg_color='white'
     )
 
-    scrollable_frame.place(x=350, y=50, relwidth = 0.485, relheight=0.75)
+    scrollable_frame.place(x=360, relwidth = 0.485, relheight=0.9)
     scrollable_frame.grid_columnconfigure(0, weight=0)
     scrollable_frame.grid_columnconfigure(1, weight=1)
     
     i = 0
+
 
     for filename in os.listdir(target_directory):
         file_path = os.path.join(target_directory, filename)
@@ -180,7 +121,7 @@ def load_csgo_demo_files():
                 scrollable_frame.grid_rowconfigure(i, weight=0)
 
                 var = ctk.BooleanVar(value=False) # Create boolean object and set its value to True
-                checkbox = ctk.CTkCheckBox(scrollable_frame, width=0, text='', variable=var, checkbox_height=20, checkbox_width=20, fg_color=color_theme) # Create a checkbox object
+                checkbox = ctk.CTkCheckBox(scrollable_frame, width=0, text='', variable=var, checkbox_height=20, checkbox_width=20, border_width=2, fg_color=color_theme) # Create a checkbox object
                 checkbox.grid(row=i, column=0) # Set the field to be in row = i and column 0
 
                 file_name_entry = ctk.CTkLabel(scrollable_frame, text=filename, width=0, anchor='w') # Create file_name object field
@@ -192,7 +133,6 @@ def load_csgo_demo_files():
 
     if not i:
         ctk.CTkLabel(scrollable_frame, text='Found no .dem files').pack()
-        
 
 
     delete = ctk.CTkButton(app, text='Delete', fg_color=danger_theme, command=delete_all_partial)
@@ -204,7 +144,24 @@ def load_csgo_demo_files():
     dynamic_buttons.append(delete)
     dynamic_buttons.append(select_all)
 
-    #load_demo_files.configure(state=ctk.DISABLED)
+    
+
+
+
+
+
+
+def load_file():
+
+    file = ctk.filedialog.askopenfile()
+    export_btn = ctk.CTkButton(main_button_frame, text="Export", fg_color=color_theme, command=export_files_partial)
+    export_btn.pack(side=ctk.LEFT)
+    load_display_demo_files(file)
+
+
+
+
+
 
 
 def load_display_demo_files(file):
@@ -228,15 +185,15 @@ def load_display_demo_files(file):
                 file_type = file[-1] # File type
 
                 var = ctk.BooleanVar(value=True) # Create boolean object and set its value to True
-                checkbox = ctk.CTkCheckBox(main_frame, width=0, text='', variable=var, checkbox_height=20, checkbox_width=20, fg_color=color_theme) # Create a checkbox object
-                checkbox.grid(row=i, column=0) # Set the field to be in row = i and column 0
+                checkbox = ctk.CTkCheckBox(main_frame, width=0, text='', variable=var, checkbox_height=20, checkbox_width=20, border_width=2, fg_color=color_theme) # Create a checkbox object
+                checkbox.grid(row=i, column=0, pady=(2, 2)) # Set the field to be in row = i and column 0
 
-                file_name_entry = ctk.CTkEntry(main_frame) # Create file_name object field
+                file_name_entry = ctk.CTkEntry(main_frame, corner_radius=1) # Create file_name object field
                 file_name_entry.insert(0, "{}_{}".format(current_date, file_name)) # Set the name as current_date + file_name
-                file_name_entry.grid(row = i, column=1, sticky='ew') # Set the field to be in row = i and column 1
+                file_name_entry.grid(row = i, column=1, sticky='ew', pady=(2, 2)) # Set the field to be in row = i and column 1
                 
                 file_type_label = ctk.CTkLabel(main_frame, text=" .{}".format(file_type)) # Create file_type object label
-                file_type_label.grid(row = i, column = 2) # Set the field to be in row = i and columnm 2
+                file_type_label.grid(row = i, column = 2, pady=(2, 2)) # Set the field to be in row = i and columnm 2
 
                 demo_files[obj] = {"checkbox": checkbox, "name": file_name_entry, "main_object": obj, 'rar_path': file_path} # Set obj (file) as a dictionary key and its objects
 
@@ -265,40 +222,27 @@ def load_display_demo_files(file):
         print("Cannot open file ")
 
 
+base_frame = ctk.CTkFrame(app, fg_color='white')
+base_frame.place(x=0, y=0, relwidth = 1, relheight = 1)
 
 
-main_frame = ctk.CTkFrame(app)
+main_frame = ctk.CTkFrame(base_frame, fg_color='white')
 main_frame.place(x=10, y=50, relwidth = 0.47, relheight=0.8)
 
 main_frame.grid_columnconfigure(0, weight=0)
 main_frame.grid_columnconfigure(1, weight=1)
 main_frame.grid_columnconfigure(2, weight=0)
-    
 
 
-#ctk.CTkLabel(main_frame, bg_color="red").pack(expand=True, fill='both')
+main_button_frame = ctk.CTkFrame(app, fg_color='white')
+main_button_frame.pack(anchor=ctk.NW, padx=10, pady=10)
 
+browse_btn = ctk.CTkButton(main_button_frame, text="Browse", fg_color=color_theme, command=load_file)
+browse_btn.pack(side=ctk.LEFT, padx=10)
 
-
-button = ctk.CTkButton(app, text="Browse", fg_color=color_theme, command=load_file)
-button.pack(side=ctk.TOP, anchor=ctk.NW, padx=10, pady=10)
-
-
-
-
-
-
-load_demo_files = ctk.CTkButton(app, text='Load_folder', fg_color=color_theme, command=load_csgo_demo_files)
-load_demo_files.pack(side=ctk.RIGHT, anchor=ctk.S, padx=10, pady=10)
-
-# textLabel = ctk.CTkLabel(app, text=f'csgo absolute path: {target_directory}')
-# textLabel.place(x=10, y=375)
-
-# name_field = ctk.CTkTextbox(app, width=400, height=200)
-# name_field.pack(pady=10)
-
-# text = ctk.CTkLabel(app, text="")
-# text.pack(padx=20, pady=40)
+refresh_btn = ctk.CTkButton(app, text='Refresh', fg_color=color_theme, command=refresh_partial)
+refresh_btn.pack(side=ctk.RIGHT, anchor=ctk.S, padx=(0, 10), pady=10)
+refresh_partial()
 
 
 
