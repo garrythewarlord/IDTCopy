@@ -45,8 +45,8 @@ Get [Winrar](https://www.win-rar.com/start.html?&L=0)
                 ```
         
         - **Replace .env variable paths**:
-            1. Navigate to .env file
-            2. Replace CSGO_PATH and UNRAR_PATH with values that point to csgo folder and unrar.exe on your system:
+            * Navigate to .env file
+            * Replace CSGO_PATH and UNRAR_PATH with values that point to csgo folder and unrar.exe on your system:
             ```
             CSGO_PATH="C:\Program Files (x86)\Steam\steamapps\common\Counter-Strike Global Offensive\game\csgo"
             UNRAR_PATH="C:\Program Files\WinRAR\UnRAR.exe"
@@ -62,13 +62,13 @@ Get [Winrar](https://www.win-rar.com/start.html?&L=0)
         [Link](https://www.test.com)
 
         - **Set up environmental variables**
-            1. Create a file extension .env inside the folder where .exe is located
-            2. Edit .env file and copy-paste variables below and replace their values with corresponding paths that your system uses:
+            * Create a file extension .env inside the folder where .exe is located
+            * Edit .env file and copy-paste variables below and replace their values with corresponding paths on your system:
             ```
             CSGO_PATH="C:\Program Files (x86)\Steam\steamapps\common\Counter-Strike Global Offensive\game\csgo"
             UNRAR_PATH="C:\Program Files\WinRAR\UnRAR.exe"
             ```
-            3. Save the .env file and run the executable.
+            * Save the .env file and run the executable.
 
 
 ## Screenshots
