@@ -12,7 +12,7 @@ load_dotenv()
 # app config
 app = ctk.CTk()
 app.title("demo_exporter")
-app._set_appearance_mode("light")  # Default light mode uses lighter shades
+app._set_appearance_mode("light")
 app.configure(bg="white")
 app.geometry("700x400")
 app.resizable(False, False)
@@ -21,23 +21,21 @@ app.resizable(False, False)
 # variables
 demo_files = {}
 csgo_folder_files = {}
+dynamic_buttons = []
 color_theme = '#232F3E'
 danger_theme = '#990011'
 current_date = date.today()
 file_path = ''
 target_directory = os.getenv('CSGO_PATH')
 rarfile.UNRAR_TOOL =  os.getenv('UNRAR_PATH') # "C:\Program Files\WinRAR\UnRAR.exe"
-dynamic_buttons = []
 
 
 
 # Partials
 def sanitize_filename(filename):
-    # Replace invalid characters with an underscore and then remove consecutive underscores
     sanitized = re.sub(r'[<>:"/\\|?*]', '_', filename)
-    # Replace consecutive underscores with a single one
     sanitized = re.sub(r'_+', '_', sanitized)
-    return sanitized.strip('_')  # Optional: Remove leading/trailing underscores if needed
+    return sanitized.strip('_')  
 
 
 
@@ -73,7 +71,7 @@ def export_files_partial():
 
         temp = file_path.split('/')[-1].split('.')
         file_type = temp[-1]
-    
+
         if file_type == 'rar':
             with rarfile.RarFile(file_path) as rf:
                 for file in demo_files:
@@ -120,12 +118,12 @@ def refresh_partial():
 
                 scrollable_frame.grid_rowconfigure(i, weight=0)
 
-                var = ctk.BooleanVar(value=False) # Create boolean object and set its value to True
+                var = ctk.BooleanVar(value=False) 
                 checkbox = ctk.CTkCheckBox(scrollable_frame, width=0, text='', variable=var, checkbox_height=20, checkbox_width=20, border_width=2, fg_color=color_theme) # Create a checkbox object
-                checkbox.grid(row=i, column=0) # Set the field to be in row = i and column 0
+                checkbox.grid(row=i, column=0)
 
-                file_name_entry = ctk.CTkLabel(scrollable_frame, text=filename, width=0, anchor='w') # Create file_name object field
-                file_name_entry.grid(row = i, column=1, sticky='ew') # Set the field to be in row = i and column 1
+                file_name_entry = ctk.CTkLabel(scrollable_frame, text=filename, width=0, anchor='w') 
+                file_name_entry.grid(row = i, column=1, sticky='ew')
 
                 i += 1
 
@@ -147,24 +145,7 @@ def refresh_partial():
     
 
 
-
-
-
-
-def load_file():
-
-    file = ctk.filedialog.askopenfile()
-    export_btn = ctk.CTkButton(main_button_frame, text="Export", fg_color=color_theme, command=export_files_partial)
-    export_btn.pack(side=ctk.LEFT)
-    load_display_demo_files(file)
-
-
-
-
-
-
-
-def load_display_demo_files(file):
+def load_nd_display_demo_files_partial(file):
 
     global file_path
     file_path = file.name
@@ -220,6 +201,16 @@ def load_display_demo_files(file):
 
     else:
         print("Cannot open file ")
+
+
+
+def load_file():
+
+    file = ctk.filedialog.askopenfile()
+    export_btn = ctk.CTkButton(main_button_frame, text="Export", fg_color=color_theme, command=export_files_partial)
+    export_btn.pack(side=ctk.LEFT)
+    load_nd_display_demo_files_partial(file)
+
 
 
 base_frame = ctk.CTkFrame(app, fg_color='white')
