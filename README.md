@@ -51,13 +51,13 @@ Get [Winrar](https://www.win-rar.com/start.html?&L=0)
     [Link](https://github.com/garrythewarlord/IDTCopy/releases/tag/v1.0)
 
     - **Set up environmental variables**
-        * Create a file extension .env inside the folder where .exe is located
-        * Edit .env file and copy-paste variables below and replace their values with corresponding paths on your system:
+        * Open a notepad
+        * Copy and paste below, replace the values to actual paths on your system:
         ```
         CSGO_PATH="C:\Program Files (x86)\Steam\steamapps\common\Counter-Strike Global Offensive\game\csgo"
         UNRAR_PATH="C:\Program Files\WinRAR\UnRAR.exe"
         ```
-        * Save the .env file and run the executable.
+        * Save the file as ".env"
     
     - **Project tree example** 
 
