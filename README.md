@@ -57,7 +57,8 @@ Get [Winrar](https://www.win-rar.com/start.html?&L=0)
         CSGO_PATH="C:\Program Files (x86)\Steam\steamapps\common\Counter-Strike Global Offensive\game\csgo"
         UNRAR_PATH="C:\Program Files\WinRAR\UnRAR.exe"
         ```
-        * Save the file as ".env"
+        * Save filename as ***".env"***
+        * Run the application
     
     - **Project tree example** 
 
